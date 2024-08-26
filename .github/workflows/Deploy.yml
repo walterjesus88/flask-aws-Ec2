@@ -29,15 +29,25 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         EC2_HOST: ${{ secrets.EC2_HOST }}
         EC2_USER: ${{ secrets.EC2_USER }}
+        EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
       run: |
+        # Escribe la clave privada en un archivo temporal
+        echo "${{ secrets.EC2_PRIVATE_KEY }}" > /tmp/ec2_key.pem
+        chmod 600 /tmp/ec2_key.pem
+
+        # Verifica el archivo temporal de clave
+        ls -l /tmp/ec2_key.pem
+        cat /tmp/ec2_key.pem
+
         # Upload code to EC2 instance
-        scp -i /path/to/your/private-key -r . $EC2_USER@$EC2_HOST:/home/ubuntu/flask-aws-Ec2
+        scp -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no -r . $EC2_USER@$EC2_HOST:/home/ubuntu/flask-aws-Ec2
 
         # SSH into EC2 and restart the application
-        ssh -i /path/to/your/private-key $EC2_USER@$EC2_HOST << 'EOF'
+        ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
           cd /home/ubuntu/flask-aws-Ec2
           source myenv/bin/activate
-          git pull origin master
+          git pull origin main
           sudo systemctl restart gunicorn
           sudo systemctl restart nginx
         EOF
+      shell: /usr/bin/bash -e {0}
