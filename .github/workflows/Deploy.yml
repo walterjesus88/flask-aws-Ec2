@@ -37,7 +37,7 @@ jobs:
         ssh -i /path/to/your/private-key $EC2_USER@$EC2_HOST << 'EOF'
           cd /home/ubuntu/flask-aws-Ec2
           source myenv/bin/activate
-          git pull origin master
+          git pull origin main
           sudo systemctl restart gunicorn
           sudo systemctl restart nginx
         EOF
