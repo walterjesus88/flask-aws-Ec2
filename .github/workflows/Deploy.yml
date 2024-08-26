@@ -23,27 +23,23 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Set up SSH key
+    - name: Write private key to file
       run: |
-        # Escribe la clave privada en un archivo temporal
         echo "${{ secrets.EC2_PRIVATE_KEY }}" > /tmp/ec2_key.pem
         chmod 600 /tmp/ec2_key.pem
 
-    - name: Verify SSH key
+    - name: Verify private key file
       run: |
-        # Verifica el archivo temporal de clave
         ls -l /tmp/ec2_key.pem
         cat /tmp/ec2_key.pem
 
     - name: Upload code to EC2 instance
       run: |
-        # Upload code to EC2 instance
-        scp -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no -r . ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ubuntu/flask-aws-Ec2
+        scp -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no -r . $EC2_USER@$EC2_HOST:/home/ubuntu/flask-aws-Ec2
 
-    - name: Restart application on EC2
+    - name: SSH into EC2 and restart the application
       run: |
-        # SSH into EC2 and restart the application
-        ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+        ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
           cd /home/ubuntu/flask-aws-Ec2
           source myenv/bin/activate
           git pull origin main
