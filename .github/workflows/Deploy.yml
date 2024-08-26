@@ -3,7 +3,7 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   deploy:
@@ -32,6 +32,9 @@ jobs:
       run: |
         ls -l /tmp/ec2_key.pem
         cat /tmp/ec2_key.pem
+
+    - name: Verify EC2_HOST
+      run: echo "EC2_HOST is $EC2_HOST"
 
     - name: Upload code to EC2 instance
       run: |
