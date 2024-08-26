@@ -35,15 +35,13 @@ jobs:
         chmod 600 /tmp/ec2_key.pem
     
         # Upload code to EC2 instance
-        scp -i /tmp/ec2_key.pem -r . $EC2_USER@$EC2_HOST:/home/ubuntu/flask-aws-Ec2
+        scp -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no -r . $EC2_USER@$EC2_HOST:/home/ubuntu/flask-aws-Ec2
     
         # SSH into EC2 and restart the application
-        ssh -i /tmp/ec2_key.pem $EC2_USER@$EC2_HOST << 'EOF'
+        ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
           cd /home/ubuntu/flask-aws-Ec2
           source myenv/bin/activate
           git pull origin main
           sudo systemctl restart gunicorn
           sudo systemctl restart nginx
         EOF
-
-
