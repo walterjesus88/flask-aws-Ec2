@@ -1,51 +1,14 @@
-name: Deploy to EC2
+name: Test Secrets
 
 on:
   push:
     branches:
       - main
-
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
-
-    - name: Install dependencies
+    - name: Print EC2_HOST
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: Write private key to file
-      run: |
-        echo "${{ secrets.EC2_PRIVATE_KEY }}" > /tmp/ec2_key.pem
-        chmod 600 /tmp/ec2_key.pem
-
-    - name: Verify private key file
-      run: |
-        ls -l /tmp/ec2_key.pem
-        cat /tmp/ec2_key.pem
-
-    - name: Verify EC2_HOST
-      run: echo "EC2_HOST is $EC2_HOST"
-
-    - name: Upload code to EC2 instance
-      run: |
-        scp -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no -r . $EC2_USER@$EC2_HOST:/home/ubuntu/flask-aws-Ec2
-
-    - name: SSH into EC2 and restart the application
-      run: |
-        ssh -i /tmp/ec2_key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
-          cd /home/ubuntu/flask-aws-Ec2
-          source myenv/bin/activate
-          git pull origin main
-          sudo systemctl restart gunicorn
-          sudo systemctl restart nginx
-        EOF
+        echo "EC2_HOST is ${{ secrets.EC2_HOST }}"
