@@ -21,7 +21,7 @@ def home():
 
     # Usamos HTML simple para mostrar la imagen
     return render_template_string('''
-        <h1>Imagen desde S3</h1>
+        <h1>Hola amigo</h1>
         <img src="{{ image_url }}" alt="Imagen de S3">
     ''', image_url=image_url)
 
